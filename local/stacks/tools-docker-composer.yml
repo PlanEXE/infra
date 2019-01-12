@@ -1,0 +1,25 @@
+version: "3.3"
+services:
+  visualizer:
+    image: wolla17/visualizer:1.0.0
+    ports:
+      - "8000:8080"
+    stop_grace_period: 1m30s
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+  portainer:
+    image: portainer/portainer
+    ports:
+      - "9000:9000"
+    stop_grace_period: 1m30s
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+networks:
+  learning_swarm_net:
+    external: true
