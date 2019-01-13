@@ -1,4 +1,6 @@
+//TF_VAR_ASW_ACCESS_KEY
 variable "AWS_ACCESS_KEY" {}
+//TF_VAR_ASW_SECRET
 variable "AWS_SECRET" {}
 provider "aws" {
 	access_key = "${var.AWS_ACCESS_KEY}"
