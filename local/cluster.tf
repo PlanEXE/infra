@@ -1,3 +1,4 @@
+variable "composer_file" {}
 resource "null_resource" "create_cluster" {
 	provisioner "local-exec" {
 		command = "docker swarm init"
@@ -7,7 +8,7 @@ resource "null_resource" "create_cluster" {
 	}
 
 	provisioner "local-exec" {
-		command = "docker stack deploy -c ./stacks/tools-docker-composer.yml tools"
+		command = "docker stack deploy -c ${var.composer_file} tools"
 	}
 	provisioner "local-exec" {
 		command = "docker swarm leave -f"
