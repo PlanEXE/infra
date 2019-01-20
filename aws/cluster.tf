@@ -8,7 +8,26 @@ provider "aws" {
 	region     = "us-east-1"
 }
 
-resource "aws_instance" "example" {
-	ami           = "ami-01e3b8c3a51e88954"
-	instance_type = "t2.micro"
+resource "aws_vpc" "planExeVPC" {
+	cidr_block       = "172.32.0.0/16"
+	tags = {
+		Name = "Plan Exe VPC"
+	}
+}
+
+resource "aws_subnet" "planExePublicSubnet" {
+	vpc_id = "${aws_vpc.planExeVPC.id}"
+	cidr_block = "172.32.1.0/24"
+	availability_zone = "us-east-1a"
+	map_public_ip_on_launch = true
+	tags = {
+		Name = "Plan Exe Public Subnet"
+	}
+}
+
+resource "aws_internet_gateway" "planExeGateway" {
+	vpc_id = "${aws_vpc.planExeVPC.id}"
+	tags = {
+		Name = "Plan Exe Gateway"
+	}
 }
