@@ -25,6 +25,16 @@ resource "aws_subnet" "planExePublicSubnet" {
 	}
 }
 
+resource "aws_subnet" "planExePrivateSubnet" {
+	vpc_id = "${aws_vpc.planExeVPC.id}"
+	cidr_block = "172.32.2.0/24"
+	availability_zone = "us-east-1b"
+	map_public_ip_on_launch = true
+	tags = {
+		Name = "Plan Exe Private Subnet"
+	}
+}
+
 resource "aws_internet_gateway" "planExeGateway" {
 	vpc_id = "${aws_vpc.planExeVPC.id}"
 	tags = {
