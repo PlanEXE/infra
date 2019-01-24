@@ -41,3 +41,33 @@ resource "aws_internet_gateway" "planExeGateway" {
 		Name = "Plan Exe Gateway"
 	}
 }
+
+resource "aws_route_table" "planExeRouteTable" {
+	vpc_id = "${aws_vpc.planExeVPC.id}"
+	route {
+		cidr_block = "0.0.0.0/0"
+		gateway_id = "${aws_internet_gateway.planExeGateway.id}"
+	}
+	tags {
+		Name = "Plan Exe route table"
+	}
+}
+
+resource "aws_route_table_association" "planExePublicSubnetRouteAssociation" {
+	subnet_id = "${aws_subnet.planExePublicSubnet.id}"
+	route_table_id = "${aws_route_table.planExeRouteTable.id}"
+}
+
+resource "aws_security_group" "planExePrincipalSecurityGroup" {
+	vpc_id = "${aws_vpc.planExeVPC.id}"
+	description = "Security Group Principal"
+	ingress {
+		from_port = 80
+		protocol = "tcp"
+		to_port = 80
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+	tags {
+		Name = "Plan Exe Security Group Principal"
+	}
+}
