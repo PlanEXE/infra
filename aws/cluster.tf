@@ -71,3 +71,32 @@ resource "aws_security_group" "planExePrincipalSecurityGroup" {
 		Name = "Plan Exe Security Group Principal"
 	}
 }
+
+resource "aws_instance" "planExeMasterInstance" {
+	ami = "ami-6869aa05"
+	instance_type = "t2.micro"
+	tags {
+		Name = "Plan Exe Master Instance"
+	}
+}
+
+output "instance_id" {
+	value = "${aws_instance.planExeMasterInstance.id}"
+
+}
+
+output "public_dns" {
+	value = "${aws_instance.planExeMasterInstance.public_dns}"
+}
+
+output "public_ip" {
+	value = "${aws_instance.planExeMasterInstance.public_ip}"
+}
+
+output "private_dns" {
+	value = "${aws_instance.planExeMasterInstance.private_dns}"
+}
+
+output "private_ip" {
+	value = "${aws_instance.planExeMasterInstance.private_ip}"
+}
