@@ -72,9 +72,20 @@ resource "aws_security_group" "planExePrincipalSecurityGroup" {
 	}
 }
 
+resource "aws_network_interface" "planExePueblicNetworkInterface" {
+	subnet_id   = "${aws_subnet.planExePublicSubnet.id}"
+	tags = {
+		Name = "plan_exe_primary_network_interface"
+	}
+}
+
 resource "aws_instance" "planExeMasterInstance" {
 	ami = "ami-6869aa05"
 	instance_type = "t2.micro"
+	network_interface {
+		network_interface_id = "${aws_network_interface.planExePueblicNetworkInterface.id}"
+		device_index         = 0
+	}
 	tags {
 		Name = "Plan Exe Master Instance"
 	}
