@@ -10,6 +10,8 @@ provider "aws" {
 
 resource "aws_vpc" "planExeVPC" {
 	cidr_block       = "172.32.0.0/16"
+	enable_dns_support = true
+	enable_dns_hostnames = true
 	tags = {
 		Name = "Plan Exe VPC"
 	}
@@ -60,6 +62,7 @@ resource "aws_route_table_association" "planExePublicSubnetRouteAssociation" {
 
 resource "aws_security_group" "planExePrincipalSecurityGroup" {
 	vpc_id = "${aws_vpc.planExeVPC.id}"
+	name = "sg_primary"
 	description = "Security Group Principal"
 	ingress {
 		from_port = 80
@@ -67,29 +70,50 @@ resource "aws_security_group" "planExePrincipalSecurityGroup" {
 		to_port = 80
 		cidr_blocks = ["0.0.0.0/0"]
 	}
+	egress {
+		from_port = 0
+		protocol = "-1"
+		to_port = 0
+		cidr_blocks = ["0.0.0.0/0"]
+	}
 	tags {
 		Name = "Plan Exe Security Group Principal"
-	}
-}
-
-resource "aws_network_interface" "planExePueblicNetworkInterface" {
-	subnet_id   = "${aws_subnet.planExePublicSubnet.id}"
-	tags = {
-		Name = "plan_exe_primary_network_interface"
 	}
 }
 
 resource "aws_instance" "planExeMasterInstance" {
 	ami = "ami-6869aa05"
 	instance_type = "t2.micro"
-	network_interface {
-		network_interface_id = "${aws_network_interface.planExePueblicNetworkInterface.id}"
-		device_index         = 0
-	}
+	subnet_id = "${aws_subnet.planExePublicSubnet.id}"
+	vpc_security_group_ids = ["${aws_security_group.planExePrincipalSecurityGroup.id}"]
+	associate_public_ip_address = true
+	user_data = <<-EOF
+		#!/bin/bash -ex
+		yum -y update
+		yum -y install httpd php mysql php-mysql
+		chkconfig httpd on
+		service httpd start
+		cd /var/www/html
+		wget https://s3-us-west-2.amazonaws.com/us-west-2-aws-training/awsu-spl/spl-13/scripts/app.tgz
+		tar xvfz app.tgz
+		chown apache:root /var/www/html/rds.conf.php
+		EOF
 	tags {
 		Name = "Plan Exe Master Instance"
 	}
 }
+/*
+resource "aws_network_interface" "planExePueblicNetworkInterface" {
+	subnet_id   = "${aws_subnet.planExePublicSubnet.id}"
+	security_groups = ["${aws_security_group.planExePrincipalSecurityGroup.id}"]
+	attachment {
+		device_index = 0
+		instance = "${aws_instance.planExeMasterInstance.id}"
+	}
+	tags = {
+		Name = "plan_exe_primary_network_interface"
+	}
+}*/
 
 output "instance_id" {
 	value = "${aws_instance.planExeMasterInstance.id}"
