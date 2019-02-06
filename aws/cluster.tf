@@ -62,7 +62,7 @@ resource "aws_route_table_association" "planExePublicSubnetRouteAssociation" {
 
 resource "aws_security_group" "planExePrincipalSecurityGroup" {
 	vpc_id = "${aws_vpc.planExeVPC.id}"
-	name = "sg_primary"
+	name = "plan_exe_sg_primary"
 	description = "Security Group Principal"
 	ingress {
 		from_port = 80
@@ -78,6 +78,27 @@ resource "aws_security_group" "planExePrincipalSecurityGroup" {
 	}
 	tags {
 		Name = "Plan Exe Security Group Principal"
+	}
+}
+
+resource "aws_security_group" "planExeDBSecurityGroup" {
+	vpc_id = "${aws_vpc.planExeVPC.id}"
+	name = "plan_exe_sg_db"
+	description = "Security Group Para la base de datos"
+	ingress {
+		from_port = 3306
+		protocol = "tcp"
+		to_port = 3306
+		security_groups = ["${aws_security_group.planExePrincipalSecurityGroup.id}"]
+	}
+	egress {
+		from_port = 0
+		protocol = "-1"
+		to_port = 0
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+	tags {
+		Name = "Plan Exe Security Group DB"
 	}
 }
 
