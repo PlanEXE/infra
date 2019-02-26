@@ -1,15 +1,11 @@
-//TF_VAR_ASW_ACCESS_KEY
-variable "AWS_ACCESS_KEY" {}
-//TF_VAR_ASW_SECRET
-variable "AWS_SECRET" {}
 provider "aws" {
 	access_key = "${var.AWS_ACCESS_KEY}"
 	secret_key = "${var.AWS_SECRET}"
-	region     = "us-east-1"
+	region     = "${var.region}"
 }
 
 resource "aws_vpc" "planExeVPC" {
-	cidr_block       = "172.32.0.0/16"
+	cidr_block       = "${var.vpc_cidr}"
 	enable_dns_support = true
 	enable_dns_hostnames = true
 	tags = {
@@ -17,27 +13,41 @@ resource "aws_vpc" "planExeVPC" {
 	}
 }
 
-resource "aws_subnet" "planExePublicSubnet" {
+resource "aws_subnet" "planExePublicSubnet1" {
+	depends_on = ["aws_vpc.planExeVPC"]
 	vpc_id = "${aws_vpc.planExeVPC.id}"
-	cidr_block = "172.32.1.0/24"
-	availability_zone = "us-east-1a"
+	cidr_block = "${var.subnet1_cidr}"
+	availability_zone = "${var.region}a"
 	map_public_ip_on_launch = true
 	tags = {
-		Name = "Plan Exe Public Subnet"
+		Name = "Plan Exe Public Subnet 1"
 	}
 }
 
-resource "aws_subnet" "planExePrivateSubnet" {
+resource "aws_subnet" "planExePublicSubnet2" {
+	depends_on = ["aws_vpc.planExeVPC"]
 	vpc_id = "${aws_vpc.planExeVPC.id}"
-	cidr_block = "172.32.2.0/24"
-	availability_zone = "us-east-1b"
+	cidr_block = "${var.subnet2_cidr}"
+	availability_zone = "${var.region}b"
 	map_public_ip_on_launch = true
 	tags = {
-		Name = "Plan Exe Private Subnet"
+		Name = "Plan Exe Public Subnet 2"
+	}
+}
+
+resource "aws_subnet" "planExePublicSubnet3" {
+	depends_on = ["aws_vpc.planExeVPC"]
+	vpc_id = "${aws_vpc.planExeVPC.id}"
+	cidr_block = "${var.subnet3_cidr}"
+	availability_zone = "${var.region}c"
+	map_public_ip_on_launch = true
+	tags = {
+		Name = "Plan Exe Public Subnet 3"
 	}
 }
 
 resource "aws_internet_gateway" "planExeGateway" {
+	depends_on = ["aws_vpc.planExeVPC"]
 	vpc_id = "${aws_vpc.planExeVPC.id}"
 	tags = {
 		Name = "Plan Exe Gateway"
@@ -45,6 +55,7 @@ resource "aws_internet_gateway" "planExeGateway" {
 }
 
 resource "aws_route_table" "planExeRouteTable" {
+	depends_on = ["aws_vpc.planExeVPC"]
 	vpc_id = "${aws_vpc.planExeVPC.id}"
 	route {
 		cidr_block = "0.0.0.0/0"
@@ -55,11 +66,25 @@ resource "aws_route_table" "planExeRouteTable" {
 	}
 }
 
-resource "aws_route_table_association" "planExePublicSubnetRouteAssociation" {
-	subnet_id = "${aws_subnet.planExePublicSubnet.id}"
+resource "aws_route_table_association" "planExePublicSubnet1RouteAssociation" {
+	depends_on = ["aws_subnet.planExePublicSubnet1", "aws_route_table.planExeRouteTable"]
+	subnet_id = "${aws_subnet.planExePublicSubnet1.id}"
 	route_table_id = "${aws_route_table.planExeRouteTable.id}"
 }
 
+resource "aws_route_table_association" "planExePublicSubnet2RouteAssociation" {
+	depends_on = ["aws_subnet.planExePublicSubnet2", "aws_route_table.planExeRouteTable"]
+	subnet_id = "${aws_subnet.planExePublicSubnet2.id}"
+	route_table_id = "${aws_route_table.planExeRouteTable.id}"
+}
+
+resource "aws_route_table_association" "planExePublicSubnet3RouteAssociation" {
+	depends_on = ["aws_subnet.planExePublicSubnet3", "aws_route_table.planExeRouteTable"]
+	subnet_id = "${aws_subnet.planExePublicSubnet3.id}"
+	route_table_id = "${aws_route_table.planExeRouteTable.id}"
+}
+
+/*
 resource "aws_security_group" "planExePrincipalSecurityGroup" {
 	vpc_id = "${aws_vpc.planExeVPC.id}"
 	name = "plan_exe_sg_primary"
@@ -134,7 +159,7 @@ resource "aws_network_interface" "planExePueblicNetworkInterface" {
 	tags = {
 		Name = "plan_exe_primary_network_interface"
 	}
-}*/
+}
 
 output "instance_id" {
 	value = "${aws_instance.planExeMasterInstance.id}"
@@ -155,4 +180,4 @@ output "private_dns" {
 
 output "private_ip" {
 	value = "${aws_instance.planExeMasterInstance.private_ip}"
-}
+}*/
