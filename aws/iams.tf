@@ -9,6 +9,17 @@ data "aws_iam_policy_document" "worker-role-policy" {
   }
 }
 
+data "aws_iam_policy_document" "proxy-role-policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com", "autoscaling.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_iam_instance_profile" "worker_instance_profile" {
   name = "worker_instance_profile"
   path = "/"
@@ -21,5 +32,14 @@ resource "aws_iam_role" "worker_role" {
   assume_role_policy = "${data.aws_iam_policy_document.worker-role-policy.json}"
   tags = {
     Name = "Worker IAM Role"
+  }
+}
+
+resource "aws_iam_role" "proxy_role" {
+  name               = "proxy_role"
+  path               = "/"
+  assume_role_policy = "${data.aws_iam_policy_document.proxy-role-policy.json}"
+  tags = {
+    Name = "Proxy IAM Role"
   }
 }

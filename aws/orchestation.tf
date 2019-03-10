@@ -12,3 +12,13 @@ resource "aws_sqs_queue" "swarm_sqs_queue" {
     Name = "Swarm SQS Queue"
   }
 }
+
+resource "aws_sqs_queue" "swarm_sqs_queue_cleanup" {
+  name                      = "swarm-sqs-queue-cleanup"
+  message_retention_seconds = 43200
+  receive_wait_time_seconds = 10
+
+  tags = {
+    Name = "Swarm SQS Queue Cleanup"
+  }
+}
