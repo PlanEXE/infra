@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "plan_exe_lab_proxy_role_policy" {
   }
 }
 
-resource "aws_iam_role_policy" "plan_exe_lab_proxy_role_policy_real" {
+resource "aws_iam_role_policy" "plan_exe_lab_proxy_role_policy_elb" {
   depends_on = ["aws_iam_role.plan_exe_lab_proxy_role"]
   name = "plan_exe_lab_proxy_role_policy_real"
   role = "${aws_iam_role.plan_exe_lab_proxy_role.id}"
@@ -70,4 +70,59 @@ resource "aws_iam_role" "plan_exe_lab_proxy_role" {
   tags = {
     Name = "Proxy IAM Role"
   }
+}
+
+resource "aws_iam_role_policy" "plan_exe_lab_proxy_ecr_policy" {
+  depends_on = ["aws_iam_role.plan_exe_lab_proxy_role", "aws_iam_role.plan_exe_lab_worker_role"]
+  name = "plan_exe_lab_ecr_policy"
+  role = "${aws_iam_role.plan_exe_lab_proxy_role.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories",
+        "ecr:ListImages",
+        "ecr:DescribeImages",
+        "ecr:BatchGetImage"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+// Politicas para dar permisos a ECR (Elastic Container Regitry) para manejar imagenes
+resource "aws_iam_role_policy" "plan_exe_lab_worker_ecr_policy" {
+  depends_on = ["aws_iam_role.plan_exe_lab_proxy_role", "aws_iam_role.plan_exe_lab_worker_role"]
+  name = "plan_exe_lab_ecr_policy"
+  role = "${aws_iam_role.plan_exe_lab_worker_role.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories",
+        "ecr:ListImages",
+        "ecr:DescribeImages",
+        "ecr:BatchGetImage"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
 }
