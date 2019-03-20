@@ -152,3 +152,53 @@ resource "aws_iam_role_policy" "plan_exe_lab_swarm_api_policy" {
 }
 EOF
 }
+
+resource "aws_iam_role_policy" "plan_exe_lab_swarm_sqs_cleanup_worker_policy" {
+  depends_on = ["aws_iam_role.plan_exe_lab_proxy_role", "aws_iam_role.plan_exe_lab_worker_role", "aws_sqs_queue.plan_exe_lab_swarm_sqs_queue_cleanup"]
+  name = "plan_exe_lab_swarm_sqs_cleanup_worker_policy"
+  role = "${aws_iam_role.plan_exe_lab_worker_role.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "sqs:DeleteMessage",
+        "sqs:ReceiveMessage",
+        "sqs:SendMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ListQueues"
+      ],
+      "Effect": "Allow",
+      "Resource": ["${aws_sqs_queue.plan_exe_lab_swarm_sqs_queue_cleanup.arn}"]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "plan_exe_lab_swarm_sqs_cleanup_proxy_policy" {
+  depends_on = ["aws_iam_role.plan_exe_lab_proxy_role", "aws_iam_role.plan_exe_lab_worker_role", "aws_sqs_queue.plan_exe_lab_swarm_sqs_queue_cleanup"]
+  name = "plan_exe_lab_swarm_sqs_cleanup_proxy_policy"
+  role = "${aws_iam_role.plan_exe_lab_proxy_role.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "sqs:DeleteMessage",
+        "sqs:ReceiveMessage",
+        "sqs:SendMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ListQueues"
+      ],
+      "Effect": "Allow",
+      "Resource": ["${aws_sqs_queue.plan_exe_lab_swarm_sqs_queue_cleanup.arn}"]
+    }
+  ]
+}
+EOF
+}
