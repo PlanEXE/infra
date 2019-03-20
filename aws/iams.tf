@@ -20,6 +20,35 @@ data "aws_iam_policy_document" "plan_exe_lab_proxy_role_policy" {
   }
 }
 
+/////////////////// Profiles //////////////////////
+resource "aws_iam_instance_profile" "plan_exe_lab_worker_instance_profile" {
+  name = "plan_exe_lab_worker_instance_profile"
+  path = "/"
+  role = "${aws_iam_role.plan_exe_lab_worker_role.name}"
+}
+
+
+/////////////////// Roles /////////////////////////
+resource "aws_iam_role" "plan_exe_lab_worker_role" {
+  name               = "plan_exe_lab_worker_role"
+  path               = "/"
+  assume_role_policy = "${data.aws_iam_policy_document.plan_exe_lab_worker_role_policy.json}"
+  tags = {
+    Name = "Worker IAM Role"
+  }
+}
+
+resource "aws_iam_role" "plan_exe_lab_proxy_role" {
+  name               = "plan_exe_lab_proxy_role"
+  path               = "/"
+  assume_role_policy = "${data.aws_iam_policy_document.plan_exe_lab_proxy_role_policy.json}"
+  tags = {
+    Name = "Proxy IAM Role"
+  }
+}
+
+
+/////////////////////// Politicas /////////////////////
 resource "aws_iam_role_policy" "plan_exe_lab_proxy_role_policy_elb" {
   depends_on = ["aws_iam_role.plan_exe_lab_proxy_role"]
   name = "plan_exe_lab_proxy_role_policy_updates"
@@ -46,30 +75,6 @@ resource "aws_iam_role_policy" "plan_exe_lab_proxy_role_policy_elb" {
   ]
 }
 EOF
-}
-
-resource "aws_iam_instance_profile" "plan_exe_lab_worker_instance_profile" {
-  name = "plan_exe_lab_worker_instance_profile"
-  path = "/"
-  role = "${aws_iam_role.plan_exe_lab_worker_role.name}"
-}
-
-resource "aws_iam_role" "plan_exe_lab_worker_role" {
-  name               = "plan_exe_lab_worker_role"
-  path               = "/"
-  assume_role_policy = "${data.aws_iam_policy_document.plan_exe_lab_worker_role_policy.json}"
-  tags = {
-    Name = "Worker IAM Role"
-  }
-}
-
-resource "aws_iam_role" "plan_exe_lab_proxy_role" {
-  name               = "plan_exe_lab_proxy_role"
-  path               = "/"
-  assume_role_policy = "${data.aws_iam_policy_document.plan_exe_lab_proxy_role_policy.json}"
-  tags = {
-    Name = "Proxy IAM Role"
-  }
 }
 
 resource "aws_iam_role_policy" "plan_exe_lab_proxy_ecr_policy" {
