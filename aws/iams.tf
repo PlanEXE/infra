@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "plan_exe_lab_proxy_role_policy" {
 
 resource "aws_iam_role_policy" "plan_exe_lab_proxy_role_policy_elb" {
   depends_on = ["aws_iam_role.plan_exe_lab_proxy_role"]
-  name = "plan_exe_lab_proxy_role_policy_real"
+  name = "plan_exe_lab_proxy_role_policy_updates"
   role = "${aws_iam_role.plan_exe_lab_proxy_role.id}"
 
   policy = <<EOF
