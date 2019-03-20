@@ -126,3 +126,24 @@ resource "aws_iam_role_policy" "plan_exe_lab_worker_ecr_policy" {
 }
 EOF
 }
+
+resource "aws_iam_role_policy" "plan_exe_lab_swarm_api_policy" {
+  depends_on = ["aws_iam_role.plan_exe_lab_proxy_role"]
+  name = "plan_exe_lab_swarm_api_policy"
+  role = "${aws_iam_role.plan_exe_lab_proxy_role.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeVpcAttribute"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
