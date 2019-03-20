@@ -3,22 +3,22 @@
 #and manager quorum.
 # SQS is used to notify a node that is going down.
 #Los nodos revisan cada cierto tiempo las colas para ver si hay que actualizar el cluster
-resource "aws_sqs_queue" "swarm_sqs_queue" {
-  name                      = "swarm-sqs-queue"
+resource "aws_sqs_queue" "plan_exe_lab_swarm_sqs_queue" {
+  name                      = "plan_exe_lab_swarm_sqs_queue"
   message_retention_seconds = 43200
   receive_wait_time_seconds = 10
 
   tags = {
-    Name = "Swarm SQS Queue"
+    Name = "Plan Exe Lab Swarm SQS Queue"
   }
 }
 
-resource "aws_sqs_queue" "swarm_sqs_queue_cleanup" {
-  name                      = "swarm-sqs-queue-cleanup"
+resource "aws_sqs_queue" "plan_exe_lab_swarm_sqs_queue_cleanup" {
+  name                      = "plan_exe_lab_swarm_sqs_queue_cleanup"
   message_retention_seconds = 43200
   receive_wait_time_seconds = 10
 
   tags = {
-    Name = "Swarm SQS Queue Cleanup"
+    Name = "Plan Exe Lab Swarm SQS Queue Cleanup"
   }
 }
